@@ -21,8 +21,7 @@ function closePopupEsc(evt) {
 }
 
 function closePopupOverlay(evt) {
-    const popupIsOpened = document.querySelector('.popup_is-opened');
-    if (evt.target.contains(popupIsOpened)) {
-        closePopup(popupIsOpened);
-    }
+    if (evt.target.classList.contains('popup_is-opened')) { 
+       closePopup(evt.target); 
+   } 
 }
