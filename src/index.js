@@ -2,6 +2,7 @@ import './pages/index.css';
 import initialCards from './scripts/cards.js';
 import { placesList, createCard, deleteCard, addCard, toggleLike } from './components/card.js';
 import { openPopup, closePopup } from './components/modal.js';
+import { enableValidation } from './components/validation.js';
 
 // находим попапы и кнопки их открытия/закрытия
 const editButton = document.querySelector('.profile__edit-button');
@@ -26,15 +27,15 @@ const profileformElement = document.forms['edit-profile'];
 // Находим поля формы редактирования
 const nameInput = profileformElement['name'];
 const jobInput = profileformElement['description'];
+export const editSubmitButton = profileformElement.querySelector('.popup__button');
 
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 
 // находим форму для создания новой карточки
 const cardFormElement = document.forms['new-place'];
-const cardNameInput = cardFormElement['place-name'];
-const cardImageInput = cardFormElement['link'];
-
+export const cardNameInput = cardFormElement['place-name'];
+export const cardImageInput = cardFormElement['link'];
 
 initialCards.forEach((item) => {
     const newCard = createCard(item, deleteCard, handleCardImage, toggleLike);
@@ -103,3 +104,16 @@ function handleCardSubmit(evt) {
 
 // Прикрепляем обработчик к форме
 cardFormElement.addEventListener('submit', handleCardSubmit);
+
+// Валидация
+const validationConfig = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+  }
+
+enableValidation(validationConfig);
+
