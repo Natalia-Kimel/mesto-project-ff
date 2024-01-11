@@ -10,17 +10,18 @@
   cursor: pointer;
 }
 
-.profile__image:hover {
-  opacity: .6;
-  transition: opacity .2s linear;
-}
-
 .edit-avatar__image {
   position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    transition: opacity .2s linear
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 36px;
+  left: 0;
+  opacity: 0;
+  background: rgba(0, 0, 0, .8);
+  transition: opacity .2s linear;
+  inline-size: 120px;
+  block-size: 120px;
 }
 
 .edit-avatar__image:hover {

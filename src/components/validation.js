@@ -66,4 +66,13 @@ export const enableValidation = () => {
       setEventListeners(formElement);
     });
 }
-  
+
+export const clearValidation = (formElement) => {
+  const inputList = Array.from(formElement.querySelectorAll('.popup__input'));
+  inputList.forEach((inputElement) => {
+    inputElement.classList.remove('popup__input_type_error');
+    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
+    errorElement.classList.remove('popup__error_visible');
+    errorElement.textContent = '';
+  });
+};

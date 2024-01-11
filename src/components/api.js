@@ -1,14 +1,15 @@
-import { editSubmitButton, cardNameInput, cardImageInput } from '../index';
+import { editSubmitButton, cardSubmitButton, cardNameInput, cardImageInput } from '../index.js';
+import { } from '../index.js';
 
-//запросы к серверу
 const config = {
-    baseUrl: 'https://nomoreparties.co/v1/cohort-42',
+    baseUrl: 'https://nomoreparties.co/v1/wff-cohort-3',
     headers: {
-      authorization: 'c56e30dc-2883-4270-a59e-b2f7bae969c6',
+      authorization: '15d64207-4e24-4a9b-be57-7c4bb960a247',
       'Content-Type': 'application/json'
     }
 }
 
+// проверка ответа сервера
 const checkResponse = (res) => {
     if (res.ok) {
       return res.json();
@@ -16,7 +17,7 @@ const checkResponse = (res) => {
     return Promise.reject(`Ошибка: ${res.status}`);
 }
 
-const getuserInfo = () => {
+export const getUserInfo = () => {
     return fetch(`${config.baseUrl}/users/me`, {
       headers: config.headers
     })
@@ -26,6 +27,10 @@ const getuserInfo = () => {
     });
 }
 
+getUserInfo();
+
+
+// получить все карточки с сервера
 export const getInitialCards = () => {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
@@ -37,14 +42,14 @@ export const getInitialCards = () => {
 }
 
 // отредактированные данные профиля сохраняются на сервере
-export const newInfo = (editInfo) => {
+export const pushInfo = (newInfo) => {
     editSubmitButton.textContent = 'Сохранение...';
     return fetch(`${config.baseUrl}/users/me`, {
         method: 'PATCH',
         headers: config.headers,
         body: JSON.stringify({
-            name: editInfo.name,
-            about: editInfo.about
+            name: newInfo.name,
+            about: newInfo.about
         })
     })
     .then((res) => checkResponse(res))
@@ -56,8 +61,8 @@ export const newInfo = (editInfo) => {
     });
 }
 
-//обновление аватара
-export const newAvatar = (avatar) => {
+//обновление аватара на сервере
+export const pushAvatar = (avatar) => {
     return fetch(`${config.baseUrl}/users/me/avatar`, {
         method: 'PATCH',
         headers: config.headers,
@@ -72,8 +77,8 @@ export const newAvatar = (avatar) => {
 }
 
 //добавить на сервер новую карточку
-export const postCard = () => {
-    addSubmitButton.textContent = 'Сохранение...';
+export const postCardApi = () => {
+    cardSubmitButton.textContent = 'Сохранение...';
     return fetch(`${config.baseUrl}/cards`, {
         method: 'POST',
         headers: config.headers,
@@ -87,12 +92,12 @@ export const postCard = () => {
         console.log(err);
     })
     .finally(() => {
-        addSubmitButton.textContent = "Сохранить";
+        cardSubmitButton.textContent = "Сохранить";
     });
 }
 
-//удаление своих карточек с сервера
-export const deleteCardAPI = (cardId) => {
+//удаление карточек с сервера
+export const deleteCardApi = (cardId) => {
     return fetch(`${config.baseUrl}/cards/${cardId}`, {
         method:  'DELETE',
         headers: config.headers
@@ -101,7 +106,7 @@ export const deleteCardAPI = (cardId) => {
     .catch((err) => {
         console.log(err);
     })
-};
+}
 
 //поставить лайк на сервере
 export const putLikeCard = (cardId) => {
@@ -115,10 +120,10 @@ export const putLikeCard = (cardId) => {
     .catch((err) => {
         console.log(err);
     })
-};
+}
 
 //снять лайк на сервере
-export const deletelikeCard = (cardId) => {
+export const deleteLikeCard = (cardId) => {
     return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
         method:  'DELETE',
         headers: config.headers
@@ -129,4 +134,4 @@ export const deletelikeCard = (cardId) => {
     .catch((err) => {
         console.log(err);
     })
-};
+}
