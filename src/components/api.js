@@ -1,4 +1,4 @@
-import { editSubmitButton, cardSubmitButton, cardNameInput, cardImageInput } from '../index.js';
+import { cardNameInput, cardImageInput } from '../index.js';
 import { } from '../index.js';
 
 const config = {
@@ -21,13 +21,8 @@ export const getUserInfo = () => {
     return fetch(`${config.baseUrl}/users/me`, {
       headers: config.headers
     })
-    .then(res => checkResponse(res))
-    .catch((err) => {
-        console.log(err);
-    });
+    .then(res => checkResponse(res));
 }
-
-getUserInfo();
 
 
 // получить все карточки с сервера
@@ -35,15 +30,11 @@ export const getInitialCards = () => {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
   })
-    .then(res => checkResponse(res))
-    .catch((err) => {
-        console.log(err);
-    });
+    .then(res => checkResponse(res));
 }
 
 // отредактированные данные профиля сохраняются на сервере
 export const pushInfo = (newInfo) => {
-    editSubmitButton.textContent = 'Сохранение...';
     return fetch(`${config.baseUrl}/users/me`, {
         method: 'PATCH',
         headers: config.headers,
@@ -52,13 +43,7 @@ export const pushInfo = (newInfo) => {
             about: newInfo.about
         })
     })
-    .then((res) => checkResponse(res))
-    .catch((err) => {
-        console.log(err);
-    })
-    .finally(() => {
-        editSubmitButton.textContent = "Сохранить";
-    });
+    .then((res) => checkResponse(res));
 }
 
 //обновление аватара на сервере
@@ -70,15 +55,11 @@ export const pushAvatar = (avatar) => {
             avatar
         })
     })
-    .then(res => checkResponse(res))
-    .catch((err) => {
-        console.log(err);
-    })
+    .then(res => checkResponse(res));
 }
 
 //добавить на сервер новую карточку
 export const postCardApi = () => {
-    cardSubmitButton.textContent = 'Сохранение...';
     return fetch(`${config.baseUrl}/cards`, {
         method: 'POST',
         headers: config.headers,
@@ -87,13 +68,7 @@ export const postCardApi = () => {
             link: cardImageInput.value
         })
     })
-    .then(res => checkResponse(res))
-    .catch(err => {
-        console.log(err);
-    })
-    .finally(() => {
-        cardSubmitButton.textContent = "Сохранить";
-    });
+    .then(res => checkResponse(res));
 }
 
 //удаление карточек с сервера
@@ -102,10 +77,7 @@ export const deleteCardApi = (cardId) => {
         method:  'DELETE',
         headers: config.headers
     })
-    .then(res => checkResponse(res))
-    .catch((err) => {
-        console.log(err);
-    })
+    .then(res => checkResponse(res));
 }
 
 //поставить лайк на сервере
@@ -114,12 +86,7 @@ export const putLikeCard = (cardId) => {
         method:  'PUT',
         headers: config.headers
     })
-    .then(res => checkResponse(res))
-    .then((data) => {
-        return data.likes.length})
-    .catch((err) => {
-        console.log(err);
-    })
+    .then(res => checkResponse(res));
 }
 
 //снять лайк на сервере
@@ -128,10 +95,5 @@ export const deleteLikeCard = (cardId) => {
         method:  'DELETE',
         headers: config.headers
     })
-    .then(res => checkResponse(res))
-    .then((data) => {
-        return data.likes.length})
-    .catch((err) => {
-        console.log(err);
-    })
+    .then(res => checkResponse(res));
 }

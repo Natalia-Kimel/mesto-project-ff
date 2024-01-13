@@ -1,26 +1,25 @@
 import './pages/index.css';
-import initialCards from './scripts/cards.js';
-import { placesList, createCard, deleteCard, addCard, toggleLike } from './components/card.js';
+import { placesList, createCard, deleteCard, handleLikeCard } from './components/card.js';
 import { openPopup, closePopup } from './components/modal.js';
-import { enableValidation } from './components/validation.js';
+import { enableValidation, clearValidation } from './components/validation.js';
 import { getUserInfo, getInitialCards, pushInfo, pushAvatar, postCardApi } from './components/api';
 
 // находим попапы и кнопки их открытия/закрытия
-const editButton = document.querySelector('.profile__edit-button');
-const popupEdit = document.querySelector('.popup_type_edit');
+const buttonEditProfile = document.querySelector('.profile__edit-button');
+const popupEditProfile = document.querySelector('.popup_type_edit');
 
-const editAvatar = document.querySelector('.edit-avatar__image');
+const imgEditAvatar = document.querySelector('.edit-avatar__image');
 const popupEditAvatar = document.querySelector('.popup_type_avatar');
 
-const addButton = document.querySelector('.profile__add-button');
+const buttonAddCard = document.querySelector('.profile__add-button');
 const popupAddCard = document.querySelector('.popup_type_new-card');
 
 const popupImage = document.querySelector('.popup_type_image');
 
-const editPopupCloser = popupEdit.querySelector('.popup__close');
-const editAvatarCloser = popupEditAvatar.querySelector('.popup__close');
-const addPopupCloser = popupAddCard.querySelector('.popup__close');
-const imagePopupCloser = popupImage.querySelector('.popup__close');
+const buttonClosePopupProfile = popupEditProfile.querySelector('.popup__close');
+const buttonClosePopupAvatar = popupEditAvatar.querySelector('.popup__close');
+const buttonClosePopupAddCard = popupAddCard.querySelector('.popup__close');
+const buttonClosePopupImage = popupImage.querySelector('.popup__close');
 
 // картинка и ее название в попапе
 const popupImageImg = popupImage.querySelector('.popup__image');
@@ -29,9 +28,10 @@ const popupImageCaption = popupImage.querySelector('.popup__caption');
 // Находим форму редактирования профиля
 const profileFormElement = document.forms['edit-profile'];
 
-// находим форму для редактирования аватара
+// находим форму редактирования аватара
 const avatarFormElement = document.forms['new-avatar'];
 const avatarInput = avatarFormElement['link'];
+const avatarSubmitButton = avatarFormElement.querySelector('.popup__button');
 
 // Находим поля формы редактирования
 const nameInput = profileFormElement['name'];
@@ -53,22 +53,25 @@ export let userId = '';
 
 
 // обработчики открытия/закрытия попапов
-editButton.addEventListener('click', handleEditClick);
-editPopupCloser.addEventListener('click', () => closePopup(popupEdit));
+buttonEditProfile.addEventListener('click', handleEditClick);
+buttonClosePopupProfile.addEventListener('click', () => closePopup(popupEditProfile));
 
-editAvatar.addEventListener('click', () => openPopup(popupEditAvatar));
-editAvatarCloser.addEventListener('click', () => closePopup(popupEditAvatar));
+imgEditAvatar.addEventListener('click', () => openPopup(popupEditAvatar));
+buttonClosePopupAvatar.addEventListener('click', () => closePopup(popupEditAvatar));
 
-addButton.addEventListener('click', () => openPopup(popupAddCard));
-addPopupCloser.addEventListener('click', () => closePopup(popupAddCard));
+buttonAddCard.addEventListener('click', () => openPopup(popupAddCard));
+buttonClosePopupAddCard.addEventListener('click', () => closePopup(popupAddCard));
 
-imagePopupCloser.addEventListener('click', () => closePopup(popupImage));
+
+buttonClosePopupImage.addEventListener('click', () => closePopup(popupImage));
 
 
 // колбэк клика по карточке
 export function handleCardImage(evt) {
-    popupImageCaption.textContent = popupImageImg.alt = evt.target.alt;
+    popupImageCaption.textContent = evt.target.alt;
+    popupImageImg.alt = evt.target.alt;
     popupImageImg.src = evt.target.src;
+
     openPopup(popupImage);
 }
 
@@ -76,39 +79,58 @@ export function handleCardImage(evt) {
 function handleEditClick() {
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDescription.textContent;
-    openPopup(popupEdit);
+    openPopup(popupEditProfile);
+    clearValidation(profileFormElement, validationConfig);
 }
 
 // отправка формы редактирования профиля
 function handleEditFormSubmit(evt) {
     evt.preventDefault();
    
+    editSubmitButton.textContent = 'Сохранение...';
+
     // Получаем значение полей jobInput и nameInput из свойства value
     const newInfo = {
         name: nameInput.value,
         about: jobInput.value
     };
     pushInfo(newInfo)
-    .then((newInfo) => {
-        profileTitle.textContent = newInfo.name;
-        profileDescription.textContent = newInfo.about;
-    });
-    closePopup(popupEdit);
+        .then((newInfo) => {
+            profileTitle.textContent = newInfo.name;
+            profileDescription.textContent = newInfo.about;
+
+            closePopup(popupEditProfile);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+        .finally(() => {
+            editSubmitButton.textContent = "Сохранить";
+        });
 }
 
 // отправка формы редактирования аватара
 function handleAvatarFormSubmit(evt) {
     evt.preventDefault();
 
+    avatarSubmitButton.textContent = "Сохранение...";
+
     const avatar = avatarInput.value;
     pushAvatar(avatar)
-    .then((newAvatar) => {
-        profileImage.src = newAvatar.avatar;
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-    closePopup(popupEditAvatar);
+        .then((newAvatar) => {
+            profileImage.src = newAvatar.avatar;
+
+            closePopup(popupEditAvatar);
+
+            avatarFormElement.reset();
+            clearValidation(cardFormElement, validationConfig);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+        .finally(() => {
+            avatarSubmitButton.textContent = "Сохранить";
+        });
   }
 
 // Прикрепляем обработчик к форме
@@ -119,43 +141,35 @@ avatarFormElement.addEventListener('submit', handleAvatarFormSubmit);
 function handleCardSubmit(evt) {
     evt.preventDefault();
 
+    cardSubmitButton.textContent = 'Сохранение...';
+
     postCardApi()
-    .then(() => {
-        const card = {
-            name: cardNameInput.value,
-            link: cardImageInput.value,
-            likes: [],
-            _id: userId,
-            owner: {
-                _id: userId
-            }
-        }
+        .then((res) => {
+            const newCard = createCard(res, deleteCard, handleCardImage, handleLikeCard);
+            
+            placesList.prepend(newCard);
 
-        const newCard = createCard(card, deleteCard, handleCardImage, toggleLike);
+            closePopup(popupAddCard);
 
-        placesList.prepend(newCard);
-
-        closePopup(popupAddCard);
-
-        cardFormElement.reset();
-    });
-    
+            cardFormElement.reset();
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+        .finally(() => {
+            cardSubmitButton.textContent = "Сохранить";
+        });
 }
 
 // Прикрепляем обработчик к форме
 cardFormElement.addEventListener('submit', handleCardSubmit);
 
-// Валидация
-const validationConfig = {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
-  }
-
-enableValidation(validationConfig);
+// Вывести карточки на страницу
+function addCard(arr) {
+    arr.forEach((item) => {
+        placesList.append(createCard(item, deleteCard, handleCardImage, handleLikeCard));
+    });
+}
 
 Promise.all([getUserInfo(), getInitialCards()])
     .then(([userInfo, cards]) => {
@@ -167,4 +181,16 @@ Promise.all([getUserInfo(), getInitialCards()])
     })
     .catch((err) => {
         console.log(err);
-})
+    });
+
+    // Валидация
+const validationConfig = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+  }
+
+  enableValidation(validationConfig);

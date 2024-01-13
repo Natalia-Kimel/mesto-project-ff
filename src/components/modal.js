@@ -1,5 +1,3 @@
-import { clearValidation } from "./validation";
-
 export function openPopup(popup) {
     popup.classList.add('popup_is-animated');
     setTimeout(() => {
@@ -13,7 +11,6 @@ export function closePopup(popup) {
     popup.classList.remove('popup_is-opened');
     document.removeEventListener('keydown', closePopupEsc);
     document.removeEventListener('click', closePopupOverlay);
-    clearValidation(popup);
 }
 
 function closePopupEsc(evt) {
