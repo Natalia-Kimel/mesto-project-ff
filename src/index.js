@@ -2,7 +2,7 @@ import './pages/index.css';
 import { placesList, createCard, deleteCard, handleLikeCard } from './components/card.js';
 import { openPopup, closePopup } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { getUserInfo, getInitialCards, pushInfo, pushAvatar, postCardApi } from './components/api';
+import { getUserInfo, getInitialCards, pushUserInfo, pushAvatar, postCardApi } from './components/api';
 
 // находим попапы и кнопки их открытия/закрытия
 const buttonEditProfile = document.querySelector('.profile__edit-button');
@@ -94,7 +94,7 @@ function handleEditFormSubmit(evt) {
         name: nameInput.value,
         about: jobInput.value
     };
-    pushInfo(newInfo)
+    pushUserInfo(newInfo)
         .then((newInfo) => {
             profileTitle.textContent = newInfo.name;
             profileDescription.textContent = newInfo.about;

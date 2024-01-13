@@ -34,7 +34,7 @@ export const getInitialCards = () => {
 }
 
 // отредактированные данные профиля сохраняются на сервере
-export const pushInfo = (newInfo) => {
+export const pushUserInfo = (newInfo) => {
     return fetch(`${config.baseUrl}/users/me`, {
         method: 'PATCH',
         headers: config.headers,
